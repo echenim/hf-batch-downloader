@@ -125,7 +125,8 @@ pip install huggingface_hub
 
 ## 📄 License
 
-MIT
+This project is licensed under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
+You are free to use, modify, and distribute it, provided that modifications are also shared under the same license.
 
 ---
 
