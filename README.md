@@ -54,10 +54,9 @@ Create a JSON file (`models_config.json`) like so:
 ```bash
 python3 hf_batch_model_downloader.py \
   --config models_config.json \
-  --base-dir models \
-  --log logs/batch_download.log \
-  --retries 3 \
-  --backoff 5
+  --hf-home ~/hf_cache_alt \
+  --min-disk 100 \
+  --log logs/batch_download.log
 ```
 
 ---

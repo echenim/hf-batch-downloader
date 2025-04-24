@@ -5,7 +5,7 @@ import logging
 import argparse
 import shutil
 import hashlib
-from huggingface_hub import snapshot_download, HfHubHTTPError
+from huggingface_hub import snapshot_download
 
 # --------------------------
 # Logging Setup
@@ -98,9 +98,14 @@ def get_directory_size_gb(directory: str) -> float:
 # --------------------------
 # Download with Retry + Summary
 # --------------------------
-def download_model(repo_id: str, quant_patterns: list, local_dir: str, max_retries: int, backoff: int, hf_home: str):
-    check_disk_space(local_dir, required_gb=60.0)
-    os.environ["HF_HOME"] = hf_homeos.path.expanduser("~/hf_cache")
+def download_model(repo_id: str, quant_patterns: list, local_dir: str, max_retries: int, backoff: int, hf_home: str, min_disk: float):
+    if not os.path.exists(hf_home):
+        try:
+            os.makedirs(hf_home, exist_ok=True)
+        except PermissionError:
+            raise PermissionError(f"❌ Cannot create Hugging Face cache directory at '{hf_home}'. Try running with elevated permissions or use a writable path.")
+    check_disk_space(hf_home, required_gb=min_disk)
+    os.environ["HF_HOME"] = hf_home
 
     attempts = 0
     start_time = time.time()
@@ -127,7 +132,7 @@ def download_model(repo_id: str, quant_patterns: list, local_dir: str, max_retri
             logger.info(summary)
             print(summary)
             return
-        except (HfHubHTTPError, Exception) as e:
+        except Exception as e:
             logger.error(f"❌ Error: {e}")
 
         attempts += 1
@@ -149,6 +154,7 @@ def main():
     parser.add_argument("--retries", type=int, default=3, help="Max retries")
     parser.add_argument("--backoff", type=int, default=5, help="Initial backoff in seconds")
     parser.add_argument("--hf-home", default=os.path.expanduser("~/hf_cache"), help="Custom Hugging Face cache directory (default: ~/hf_cache)")
+    parser.add_argument("--min-disk", type=float, default=60.0, help="Minimum free disk space in GB required before download")
     args = parser.parse_args()
 
     global logger
@@ -165,7 +171,7 @@ def main():
         quant_list = model["quant"]
 
         local_dir = create_model_dir(args.base_dir, org, name, size)
-        download_model(repo, quant_list, local_dir, args.retries, args.backoff, args.hf_home)
+        download_model(repo, quant_list, local_dir, args.retries, args.backoff, args.hf_home, args.min_disk)
 
 if __name__ == "__main__":
     main()

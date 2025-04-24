@@ -1,0 +1,16 @@
+[
+  {
+    "org": "meta-llama-unsloth-community",
+    "model": "maverick",
+    "size": "17B",
+    "repo_id": "unsloth/Llama-4-Maverick-17B-128E-Instruct-GGUF",
+    "quant": ["Q4_K_M", "Q5_K_M"]
+  },
+  {
+    "org": "meta-llama-bartowski",
+    "model": "scout",
+    "size": "34B",
+    "repo_id": "bartowski/meta-llama_Llama-4-Scout-34B-128E-Instruct-GGUF",
+    "quant": ["Q4_K_M"]
+  }
+]
